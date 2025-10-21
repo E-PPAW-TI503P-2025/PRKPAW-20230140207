@@ -3,6 +3,11 @@ const cors = require('cors');
 const app = express();
 const PORT = 3001;
 const bookRoutes = require('./routes/books');
+const presensiRoutes = require("./routes/presensi");
+const reportRoutes = require("./routes/reports");
+
+app.use("/api/presensi", presensiRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Middleware
 app.use(cors());
