@@ -1,10 +1,19 @@
+'use strict';
+const {
+  Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  const Presensi = sequelize.define("Presensi", {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
+  class Presensi extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+  Presensi.init({
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -19,9 +28,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     checkOut: {
       type: DataTypes.DATE,
-      allowNull: true,
-    },
+      allowNull: true, // Boleh null
+    }
+  }, {
+    sequelize,
+    modelName: 'Presensi',
   });
-
   return Presensi;
 };

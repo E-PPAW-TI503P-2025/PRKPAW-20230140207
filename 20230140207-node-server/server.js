@@ -5,9 +5,7 @@ const PORT = 3001;
 const bookRoutes = require('./routes/books');
 const presensiRoutes = require("./routes/presensi");
 const reportRoutes = require("./routes/reports");
-
-app.use("/api/presensi", presensiRoutes);
-app.use("/api/reports", reportRoutes);
+const authRoutes = require('./routes/auth');
 
 // Middleware
 app.use(cors());
@@ -19,6 +17,10 @@ app.use((req, res, next) => {
     console.log("Body:", req.body); // Debug body
     next();
 });
+
+app.use("/api/presensi", presensiRoutes);
+app.use("/api/reports", reportRoutes);
+app.use('/api/auth', authRoutes);
 
 // Route utama
 app.get('/', (req, res) => {
