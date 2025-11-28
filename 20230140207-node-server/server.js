@@ -1,36 +1,46 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
+
 const app = express();
 const PORT = 3001;
-const bookRoutes = require('./routes/books');
+
+// IMPORT ROUTES
+const bookRoutes = require("./routes/books");
 const presensiRoutes = require("./routes/presensi");
 const reportRoutes = require("./routes/reports");
-const authRoutes = require('./routes/auth');
+const authRoutes = require("./routes/auth");
 
-// Middleware
+// GLOBAL MIDDLEWARE
 app.use(cors());
-app.use(express.json()); // Baca JSON body
-app.use(express.urlencoded({ extended: true })); // Support form body
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// DEBUG REQUEST LOGGER
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    console.log("Body:", req.body); // Debug body
-    next();
+  console.log(`📌 [${req.method}] ${req.url}`);
+  console.log("➡ Body:", req.body);
+  next();
 });
 
+// ROUTES
+app.use("/api/auth", authRoutes);
 app.use("/api/presensi", presensiRoutes);
 app.use("/api/reports", reportRoutes);
-app.use('/api/auth', authRoutes);
+app.use("/api/books", bookRoutes);
 
-// Route utama
-app.get('/', (req, res) => {
-    res.send('Home Page for API');
+// ROOT ROUTE
+app.get("/", (req, res) => {
+  res.send("API Server Running...");
 });
 
-// Route untuk books
-app.use('/api/books', bookRoutes);
+// 404 HANDLER
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Endpoint tidak ditemukan",
+  });
+});
 
-// Jalankan server
+// START SERVER
 app.listen(PORT, () => {
-    console.log(`✅ Express server running at http://localhost:${PORT}/`);
+  console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
 });
