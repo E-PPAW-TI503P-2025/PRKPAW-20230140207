@@ -13,6 +13,13 @@ http://localhost:3000/login
 Dashboard Page 
 http://localhost:3000/dashboard
 
+<<<<<<< HEAD
 
 ![alt text](SS/dashboard.png)
 
+=======
+<<<<<<< HEAD
+![alt text](SS/dashboard.png)
+=======
+>>>>>>> fec442b456bab8d7aef4fa62ae6e98b77f9fcba3
+>>>>>>> a315b2b4c17605414eda109e16fb6a859c8dc4bf
