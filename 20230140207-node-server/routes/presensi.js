@@ -4,9 +4,17 @@ const router = express.Router();
 const presensiController = require("../controllers/presensiController");
 const { authenticateToken } = require("../middleware/permissionMiddleware");
 
-// ROUTE USER
-router.post("/check-in", authenticateToken, presensiController.CheckIn);
+// CHECK-IN (DENGAN UPLOAD SELFIE)
+router.post(
+  "/check-in",
+  [authenticateToken, presensiController.upload.single("image")],
+  presensiController.CheckIn
+);
+
+// CHECK-OUT
 router.post("/check-out", authenticateToken, presensiController.CheckOut);
+
+// GET DAILY REPORT
 router.get("/daily", authenticateToken, presensiController.getDailyReport);
 
 module.exports = router;
