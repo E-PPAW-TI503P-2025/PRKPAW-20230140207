@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path"); // ← WAJIB untuk akses folder static
 
 const app = express();
 const PORT = 3001;
@@ -14,6 +15,10 @@ const authRoutes = require("./routes/auth");
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// 🔥 STATIC FOLDER UNTUK FOTO SELFIE
+// Bisa diakses via: http://localhost:3001/uploads/namafile.jpg
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // DEBUG REQUEST LOGGER
 app.use((req, res, next) => {
