@@ -3,35 +3,69 @@ const { Op } = require("sequelize");
 const { format } = require("date-fns-tz");
 const timeZone = "Asia/Jakarta";
 
-// CHECK-IN
+/* ============================================================
+   MULTER CONFIG (WAJIB untuk upload foto selfie)
+   ============================================================ */
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // folder tempat foto disimpan
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`
+    );
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Hanya file gambar yang diperbolehkan!"), false);
+  }
+};
+
+exports.upload = multer({ storage: storage, fileFilter: fileFilter });
+
+/* ============================================================
+   CHECK-IN (VERSION WITH SELFIE)
+   ============================================================ */
 exports.CheckIn = async (req, res) => {
   try {
-    const userId = req.user.id; // ambil dari JWT token
-    const { latitude, longitude } = req.body; // ambil lokasi dari request
+    const { id: userId, nama: userName } = req.user;
+    const { latitude, longitude } = req.body;
     const waktuSekarang = new Date();
+
+    // Foto dari multer (path disimpan)
+    const buktiFoto = req.file ? req.file.path : null;
 
     const user = await User.findByPk(userId);
     if (!user) {
       return res.status(404).json({ message: "User tidak ditemukan" });
     }
 
-    // cek apakah sudah check-in hari ini (belum check-out)
+    // Cek apakah sudah check-in dan belum check-out
     const existingRecord = await Presensi.findOne({
       where: { userId, checkOut: null },
     });
 
     if (existingRecord) {
-      return res
-        .status(400)
-        .json({ message: "Anda sudah melakukan check-in hari ini." });
+      return res.status(400).json({
+        message: "Anda sudah melakukan check-in hari ini.",
+      });
     }
 
     const newRecord = await Presensi.create({
       userId,
-      nama: user.nama, // ambil nama dari user
+      nama: user.nama,
       checkIn: waktuSekarang,
-      latitude: latitude || null, // simpan latitude
-      longitude: longitude || null, // simpan longitude
+      latitude: latitude || null,
+      longitude: longitude || null,
+      buktiFoto: buktiFoto,
     });
 
     res.status(201).json({
@@ -51,10 +85,12 @@ exports.CheckIn = async (req, res) => {
   }
 };
 
-// CHECK-OUT
+/* ============================================================
+   CHECK-OUT
+   ============================================================ */
 exports.CheckOut = async (req, res) => {
   try {
-    const userId = req.user.id; // ambil dari JWT token
+    const userId = req.user.id;
     const waktuSekarang = new Date();
 
     const recordToUpdate = await Presensi.findOne({
@@ -71,11 +107,11 @@ exports.CheckOut = async (req, res) => {
     await recordToUpdate.save();
 
     res.json({
-      message: `Halo ${recordToUpdate.nama}, check-out berhasil pada pukul ${format(
-        waktuSekarang,
-        "HH:mm:ss",
-        { timeZone }
-      )} WIB`,
+      message: `Halo ${
+        recordToUpdate.nama
+      }, check-out berhasil pada pukul ${format(waktuSekarang, "HH:mm:ss", {
+        timeZone,
+      })} WIB`,
       data: recordToUpdate,
     });
   } catch (error) {
@@ -87,7 +123,9 @@ exports.CheckOut = async (req, res) => {
   }
 };
 
-// HAPUS PRESENSI
+/* ============================================================
+   HAPUS PRESENSI
+   ============================================================ */
 exports.hapusPresensi = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -116,7 +154,9 @@ exports.hapusPresensi = async (req, res) => {
   }
 };
 
-// UPDATE PRESENSI
+/* ============================================================
+   UPDATE PRESENSI
+   ============================================================ */
 exports.updatePresensi = async (req, res) => {
   try {
     const presensiId = req.params.id;
@@ -161,10 +201,13 @@ exports.updatePresensi = async (req, res) => {
   }
 };
 
-// GET DAILY REPORT
+/* ============================================================
+   GET DAILY REPORT
+   ============================================================ */
 exports.getDailyReport = async (req, res) => {
   try {
     const { nama, startDate, endDate } = req.query;
+
     let options = {
       include: [
         {
