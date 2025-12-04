@@ -37,12 +37,19 @@ module.exports = (sequelize, DataTypes) => {
       longitude: {
         type: DataTypes.DECIMAL(11, 8),
         allowNull: true
+      },
+
+      // ✅ TAMBAHKAN INI
+      buktiFoto: {
+        type: DataTypes.STRING,
+        allowNull: true
       }
+
     },
     {
       sequelize,
       modelName: "Presensi",
-      tableName: "Presensis", // sesuaikan jika tabel kamu bernama lain
+      tableName: "Presensis",
     }
   );
 
