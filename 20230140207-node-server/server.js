@@ -10,6 +10,10 @@ const bookRoutes = require("./routes/books");
 const presensiRoutes = require("./routes/presensi");
 const reportRoutes = require("./routes/reports");
 const authRoutes = require("./routes/auth");
+const iotRoutes = require("./routes/iot");
+
+app.use("/api/iot", iotRoutes);
+
 
 // GLOBAL MIDDLEWARE
 app.use(cors());
@@ -49,3 +53,4 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
 });
+
